@@ -1,0 +1,65 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parameters
+d = 1.0      # Distance between lines
+l = 1.0      # Length of needle, l <= d
+N = 10000    # Number of needle drops
+
+np.random.seed(42)  # For reproducibility
+
+# Randomly generate x (center distance to nearest line) and theta (angle with horizontal)
+x = np.random.uniform(0, d/2, N)
+theta = np.random.uniform(0, np.pi/2, N)
+
+# Condition for crossing
+crosses = (l/2) * np.sin(theta) >= x
+num_crossings = np.cumsum(crosses)
+
+# Estimator for π at each step
+n_values = np.arange(1, N + 1)
+pi_estimates = (2 * n_values) / (d * num_crossings)
+pi_estimates[~np.isfinite(pi_estimates)] = np.nan  # Avoid division by zero in early steps
+
+# Plotting convergence
+plt.figure(figsize=(10, 6))
+plt.plot(n_values, pi_estimates, label='Estimated π')
+plt.axhline(np.pi, color='red', linestyle='--', label='True π')
+plt.xscale('log')
+plt.xlabel('Number of Needle Drops (log scale)')
+plt.ylabel('Estimated π')
+plt.title('Convergence of π Estimate using Buffon\'s Needle Simulation')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+
+
+Random Seed Initialization
+The pseudorandom number generator seed affects the sequence of generated numbers. Different seeds may cause slightly different convergence patterns, especially in the early simulation stages.
+
+Sample Size (N)
+A small number of trials leads to high variance in the π estimate. As N → ∞, the estimate converges more closely to the true value of π due to the Law of Large Numbers.
+
+Angle Sampling Precision
+The angle θ is sampled uniformly from 
+[0,𝜋/2] [0, 2π]
+​. Any bias or discretization in this distribution can skew the needle's orientation probability, affecting crossing outcomes and thus the estimate.
+
+Needle Length vs Line Distance (l ≤ d)
+The formula assumes 𝑙≤𝑑. Edge cases where l = d may introduce more frequent crossings and more sensitivity to numerical precision, potentially affecting accuracy.
+
+Floating-Point Precision
+As with any numerical simulation, floating-point arithmetic can introduce rounding errors, especially in trigonometric calculations like sin(θ).
+
+Early Step Instability
+In early steps (when number of crossings is still small), division by a small number causes large fluctuations in π estimates. This is handled in code by using np.nan where necessary.
+
+
+
+
+
+
+
